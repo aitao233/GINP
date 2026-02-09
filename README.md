@@ -40,18 +40,17 @@ The current implementation focuses on **correctness and reproducibility**,
 not maximum performance.
 
 ---
-
 ## Repository Structure
 
 GINP/
 ├─ Plugin/ # Core Unreal Engine source (source-library style)
 ├─ Demo/ # Demonstration assets / videos
-├─ docs/ # Architecture notes and design rationale
-├─ experiments/ # Exploratory or unstable research code
-├─ validation/ # Verification, comparison, or sanity checks
+├─ docs/ # Notes / rationale
+├─ experiments/ # Exploratory research code
+├─ validation/ # Verification / sanity checks
 ├─ src/ # Auxiliary or non-UE source code
-├─ tools/ # Python and utility scripts
-├─ _imported/ # Archived original source materials
+├─ tools/ # Python and utilities
+└─ _imported/ # Archived original materials
 
 
 ### Structure Notes
@@ -105,6 +104,11 @@ As such, clarity and auditability are prioritized over convention.
 ## License
 
 This project is released under the terms specified in the `LICENSE` file.
+
+---
+
+## Demo
+See `Demo/` for the reference video and materials.
 
 ---
 
