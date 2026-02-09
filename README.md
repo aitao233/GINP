@@ -42,15 +42,20 @@ not maximum performance.
 ---
 ## Repository Structure
 
+```text
 GINP/
-├─ Plugin/ # Core Unreal Engine source (source-library style)
-├─ Demo/ # Demonstration assets / videos
-├─ docs/ # Notes / rationale
-├─ experiments/ # Exploratory research code
-├─ validation/ # Verification / sanity checks
-├─ src/ # Auxiliary or non-UE source code
-├─ tools/ # Python and utilities
-└─ _imported/ # Archived original materials
+├─ Plugin/       # Core Unreal Engine source (source-library style)
+├─ Demo/         # Demonstration assets / videos
+├─ docs/         # Notes / rationale
+├─ experiments/  # Exploratory research code
+├─ validation/   # Verification / sanity checks
+├─ src/          # Auxiliary or non-UE source code
+├─ tools/        # Python and utilities
+└─ _imported/    # Archived original materials
+| 
+```
+
+---
 
 
 ### Structure Notes
