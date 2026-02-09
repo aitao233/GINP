@@ -122,3 +122,8 @@ See `Demo/` for the reference video and materials.
 - **Current Version:** v0.1.0 (initial public baseline)
 - **Stability:** Experimental
 - **Intended Audience:** Engine developers, technical artists, researchers
+
+---
+GNIP is an engineering-oriented framework for analyzing continuous-to-discrete system behavior through local response collapse.
+It introduces heuristic, computable indicators to describe compression and stability under practical constraints.
+This project focuses on design rationale and implementability rather than formal mathematical theory.
