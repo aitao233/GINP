@@ -1,43 +1,42 @@
-// GINP_Core.hlsl - Global Injective Nonlinear Projection Core v1.0
-// ----------------------------------------------------------------
+// GINP_math.hlsl - Core Operator v1.0
+// Designed for high-integrity nonlinear projection
 
-#ifndef GINP_CORE_INCLUDED
-#define GINP_CORE_INCLUDED
+#ifndef GINP_MATH_INCLUDED
+#define GINP_MATH_INCLUDED
 
-// ºËĞÄ²ÎÊı£º¿ÉÒÔÓÉ Material Property »ò Constant Buffer ´«Èë
-// _GinpStrength: ¸ÉÔ¤Ç¿¶È
-// _GinpEta: Èí»¯Òò×Ó (ÍÆ¼öÖµ 0.05 - 0.1)
-// _GinpCenter: Å¤×ªÖĞĞÄ (ÆÁÄ»¿Õ¼ä UV)
+struct GINPControl {
+    float intensity;    // T_raw
+    float lambda;       // ç©ºé—´å‹ç¼©æé™ (æ¨è 0.8-0.9)
+    float mollifier;    // Î· (è¿‘è£å‰ªé¢è½¯åŒ–å› å­)
+};
 
-float4 ApplyGINP(float4 clipPos, float strength, float eta, float2 centerUV)
-{
-    // 1. ÌáÈ¡Ô­Ê¼Æë´Î×ø±ê
-    float w_orig = clipPos.w;
+/**
+ * GINP æ ¸å¿ƒåæ ‡å˜æ¢
+ * è¾“å…¥ï¼šæ ‡å‡†æŠ•å½±åçš„é½æ¬¡åæ ‡ (Clip Space)
+ * è¾“å‡ºï¼šç»è¿‡ GINP ä¿®æ­£çš„é½æ¬¡åæ ‡
+ */
+float4 ApplyGINP(float4 posCS, GINPControl ctrl) {
+    float w = posCS.w;
+    float z = posCS.z;
+
+    // --- 1. è½¯åŒ–å› å­ (Mollifier) ---
+    // è§£å†³éªŒè¯ç‚¹ 3ï¼šç¡®ä¿ w->0 æ—¶å¹²é¢„åœºå¹³æ»‘æ¶ˆå¤±
+    float alpha = ctrl.mollifier * w;
     
-    // 2. ³ß¶ÈÎŞ¹Ø Mollification (»ùÓÚÄãÑéÖ¤µÄ alpha = eta * w)
-    float alpha = eta * w_orig;
-    
-    // 3. ¼ÆËãÆÁÄ»Í¶Ó°¾àÀë r
-    // ½« clip space Ó³Éäµ½ [-1, 1] µÄ UV ¿Õ¼ä½øĞĞ¼ÆËã
-    float2 uv = clipPos.xy / (w_orig + 0.00001f);
-    float r = length(uv - centerUV);
-    
-    // 4. Ô­Ê¼¸ÉÔ¤³¡¼ÆËã
-    float rawTorsion = strength / sqrt(r * r + alpha * alpha);
-    
-    // 5. ¡¾µ¥ÉäĞÔ±£»¤¡¿ºËĞÄ¹«Ê½ (»ùÓÚÄãÑéÖ¤µÄÂÌÉ«ÇúÏß)
-    // T_safe = 0.95 * (1 - exp(-T_raw))
-    float safeTorsion = 0.95f * (1.0f - exp(-max(0.0f, rawTorsion)));
-    
-    // 6. Ö´ĞĞ w Öá¸ÉÔ¤
-    float4 ginpPos = clipPos;
-    ginpPos.w = w_orig * (1.0f + safeTorsion);
-    
-    // 7. ¡¾Éî¶ÈÒ»ÖÂĞÔĞŞÕı¡¿ºËĞÄ¹«Ê½ (»ùÓÚÄãÑéÖ¤µÄ Z-Order µ¥µ÷ĞÔ)
-    // z' = z * (w' / w)
-    ginpPos.z *= (ginpPos.w / w_orig);
-    
-    return ginpPos;
+    // --- 2. è½¯é’³ä½å¹²é¢„åœº (Safe Torsion) ---
+    // è§£å†³éªŒè¯ç‚¹ 1ï¼šé€šè¿‡æŒ‡æ•°é’³ä½ä¿è¯å•å°„æ€§ (dw'/dw > 0)
+    // è¿™é‡Œç®€åŒ–æ¨¡æ‹Ÿä¸€ä¸ªå¾„å‘å¹²é¢„åœºï¼Œå®é™…å¯æ ¹æ® R å˜åŒ–
+    float T_raw = ctrl.intensity; 
+    float T_safe = ctrl.lambda * (1.0 - exp(-max(0, T_raw)));
+
+    // --- 3. è®¡ç®— w' ---
+    float w_prime = w * (1.0 + T_safe);
+
+    // --- 4. æ·±åº¦ä¸€è‡´æ€§è¡¥å¿ (Depth Alignment) ---
+    // è§£å†³ Z-order å†²çªï¼šä¿æŒ z/w æ¯”ä¾‹
+    float z_prime = z * (w_prime / w);
+
+    return float4(posCS.xy, z_prime, w_prime);
 }
 
 #endif
